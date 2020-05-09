@@ -17,10 +17,10 @@ class ChatUser {
   }
 
   /** send msgs to this client using underlying connection-send-function */
-
   send(data) {
     try {
       this._send(data);
+      console.log("sent")
     } catch {
       // If trying to send to a user fails, ignore it
     }
@@ -46,6 +46,21 @@ class ChatUser {
       text: text
     });
   }
+  
+  /** handle a joke: select joke and send back to only the user who requested it */
+  handleJoke() {
+    
+    const jokes = ["Where does a king keep his armies? In his sleevies", "What is brown and sticky? A stick"]
+  
+    const randIdx = Math.floor(Math.random() * 2)
+    const data = {
+      name: this.name,
+      type: 'joke',
+      text: jokes[randIdx]
+    }
+
+    this.send(JSON.stringify(data));
+  }
 
   /** Handle messages from client:
    *
@@ -55,9 +70,9 @@ class ChatUser {
 
   handleMessage(jsonData) {
     let msg = JSON.parse(jsonData);
-
     if (msg.type === 'join') this.handleJoin(msg.name);
     else if (msg.type === 'chat') this.handleChat(msg.text);
+    else if (msg.type === 'joke') this.handleJoke();
     else throw new Error(`bad message: ${msg.type}`);
   }
 
