@@ -49,33 +49,40 @@ class ChatUser {
   /** handle a joke: select joke and send back to only the user who requested it */
   handleJoke() {
     
-    const jokes = ["Where does a king keep his armies? In his sleevies", "What is brown and sticky? A stick"]
+    const jokes = ["Where does a king keep his armies? In his sleevies", "What is brown and sticky? A stick"];
   
-    const randIdx = Math.floor(Math.random() * 2)
-    const data = {
-      name: this.name,
-      type: 'joke',
-      text: jokes[randIdx]
-    }
-
+    const randIdx = Math.floor(Math.random() * 2);
+  
+    const data = this.createDataObj(this.name, 'joke', jokes[randIdx]);
     this.send(JSON.stringify(data));
+  }
+
+  createDataObj(name, type, text){
+    return {name, type , text};
   }
 
   handleMembers(){
-    let membersList = []
-    
-    for (let member of this.room.members) {
-      membersList.push(member.name)
-    }
-    console.log(membersList)
-    const data = {
-      name: this.name,
-      type: 'members',
-      text: `In room: ${membersList}`
-    }
+  
+    const memberNames = Array.from(this.room.members).map(member => member.name);
+  
+    const data = this.createDataObj(this.name, 'members', `In room: ${memberNames}`);
     this.send(JSON.stringify(data));
   }
 
+  handlePrivateMessage(text) {
+    const textArray = text.split(" ");
+    
+    const recipient = Array.from(this.room.members).find(member => member.name === textArray[1]);
+    if (!recipient) {
+      throw new Error('User not in chat room');
+    }
+
+    textArray.splice(0, 2);
+  
+    const data = this.createDataObj(this.name, 'chat', textArray.join(" "));
+    recipient.send(JSON.stringify(data));
+  }
+  
   /** Handle messages from client:
    *
    * - {type: "join", name: username} : join
@@ -88,6 +95,7 @@ class ChatUser {
     else if (msg.type === 'chat') this.handleChat(msg.text);
     else if (msg.type === 'joke') this.handleJoke();
     else if (msg.type === 'members') this.handleMembers();
+    else if (msg.type === 'priv') this.handlePrivateMessage(msg.text);
     else throw new Error(`bad message: ${msg.type}`);
   }
 

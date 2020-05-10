@@ -66,11 +66,10 @@ $('form').submit(function (evt) {
 
   if ($("#m").val() === "/members") data.type = "members";
   
+  if ($("#m").val().startsWith('/priv')) data.type = "priv";
   
   ws.send(JSON.stringify(data));
   
-  
-
   $('#m').val('');
 });
 

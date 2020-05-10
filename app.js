@@ -13,7 +13,6 @@ app.use(express.static('static/'));
 const wsExpress = require('express-ws')(app);
 
 const ChatUser = require('./ChatUser');
-
 /** Handle a persistent connection to /chat/[roomName]
  *
  * Note that this is only called *once* per client --- not every time
