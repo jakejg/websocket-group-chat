@@ -20,7 +20,6 @@ class ChatUser {
   send(data) {
     try {
       this._send(data);
-      console.log("sent")
     } catch {
       // If trying to send to a user fails, ignore it
     }
@@ -62,6 +61,21 @@ class ChatUser {
     this.send(JSON.stringify(data));
   }
 
+  handleMembers(){
+    let membersList = []
+    
+    for (let member of this.room.members) {
+      membersList.push(member.name)
+    }
+    console.log(membersList)
+    const data = {
+      name: this.name,
+      type: 'members',
+      text: `In room: ${membersList}`
+    }
+    this.send(JSON.stringify(data));
+  }
+
   /** Handle messages from client:
    *
    * - {type: "join", name: username} : join
@@ -73,6 +87,7 @@ class ChatUser {
     if (msg.type === 'join') this.handleJoin(msg.name);
     else if (msg.type === 'chat') this.handleChat(msg.text);
     else if (msg.type === 'joke') this.handleJoke();
+    else if (msg.type === 'members') this.handleMembers();
     else throw new Error(`bad message: ${msg.type}`);
   }
 

@@ -25,7 +25,7 @@ ws.onmessage = function(evt) {
   let msg = JSON.parse(evt.data);
   let item;
 
-  if (msg.type === "note" || msg.type == "joke") {
+  if (msg.type === "note" || msg.type == "joke" || msg.type == "members") {
     item = $(`<li><i>${msg.text}</i></li>`);
   }
 
@@ -62,9 +62,10 @@ $('form').submit(function (evt) {
   
   let data = {type: "chat", text: $("#m").val()};
 
-  if ($("#m").val() === "/joke") {
-    data.type = "joke";
-  }
+  if ($("#m").val() === "/joke") data.type = "joke";
+
+  if ($("#m").val() === "/members") data.type = "members";
+  
   
   ws.send(JSON.stringify(data));
   
